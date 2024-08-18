@@ -1,6 +1,6 @@
 'use client'
 import React, {Fragment, useEffect, useState } from 'react'
-import { AppBar, Box, Grid, Toolbar, Button, Typography } from "@mui/material";
+import { AppBar, Box, Grid, Toolbar, Typography } from "@mui/material";
 import { app, auth, db } from "../firebase"
 import { useRouter } from 'next/navigation';
 import { signOut, deleteUser } from 'firebase/auth';
@@ -23,7 +23,7 @@ const page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!auth.currentUser) {
       router.push('/');
     }
   }, [user]);
