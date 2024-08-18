@@ -5,7 +5,7 @@ import RecentActorsIcon from '@mui/icons-material/RecentActors';
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "./firebase"
+import { auth } from "../firebase"
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
