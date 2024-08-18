@@ -71,8 +71,7 @@ const SignUpForm = () => {
             firstName: firstName,
             lastName: lastName,
             email: email,
-            id: importantId,
-            subscribed: false
+            id: importantId
         });
 
         setEmail('');
