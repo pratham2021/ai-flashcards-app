@@ -86,7 +86,7 @@ const SignUpForm = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      router.push('/dashboard');
+      router.push('../app/dashboard');
     } catch (error) {
       setError('An error occured. Please try again.');
     }
