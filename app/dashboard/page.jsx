@@ -1,6 +1,6 @@
 'use client'
 import React, { Fragment, useEffect, useState } from 'react'
-import { AppBar, Box, Grid, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Paper, TextField, Box, Grid, Toolbar, Typography } from "@mui/material";
 import { app, auth, db } from "../../firebase"
 import { useRouter } from 'next/navigation';
 import { signOut, deleteUser } from 'firebase/auth';
@@ -14,44 +14,120 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import ItemCard from '../../components/ItemCard';
 import { motion } from 'framer-motion';
-import FlashCardGenerationForm from '../../components/FlashCardGenerationForm';
+import { makeStyles } from '@mui/styles';
+import { generateFlashcard, generateFlashcards } from '../api/generation';
+
+const useStyles = makeStyles({
+  field: {
+    display: 'block'
+  }
+});
 
 const page = () => {
   
   const [user] = useAuthState(auth);
-  const [flashCards, setFlashCards] = useState([]);
+  
   const [text, setText] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async () => {
-    if (!text.trim()) {
-      alert('Please enter some text to generate flashcards.')
-      return
+  const [topic, setTopic] = useState('');
+  const [numberOfFlashcards, setNumberOfFlashcards] = useState(1);
+
+  const classes = useStyles();
+
+  const [topicError, setTopicError] = useState(false);
+  const [numberOfFlashcardsError, setNumberOfFlashcardsError] = useState(false);
+
+  const [flashCards, setFlashCards] = useState([]);
+
+  const handleGenerate = async (event) => {
+    event.preventDefault();
+
+    if (!topic.trim()) {
+      alert('Please enter some text to generate flashcards.');
+      return;
     }
-  
-    try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        body: text,
-      })
-  
-      if (!response.ok) {
-        throw new Error('Failed to generate flashcards')
+
+    if (!numberOfFlashcards.trim()) {
+      alert('Please enter a number to be able to generate flashcards.')
+      return;
+    }
+
+    if (!topic) {
+      setTopicError(true);
+    }
+
+    if (!numberOfFlashcards) {
+      setNumberOfFlashcardsError(true);
+    }
+
+    if (topic && numberOfFlashcards) {
+      setTopicError(false);
+      setNumberOfFlashcardsError(false);
+
+      // Generate the flashcards with the OpenAI API
+      try {
+        const generatedFlashcards = await createFlashcards(topic, numberOfFlashcards);
+        setFlashCards(generatedFlashcards);
+      } catch (error) {
+        console.error(error.message);
       }
-  
-      const data = await response.json()
-      setFlashCards(data);
-    } catch (error) {
-      console.error('Error generating flashcards:', error)
-      alert('An error occurred while generating flashcards. Please try again.')
     }
-  }
+
+    setTopic('');
+    setNumberOfFlashcards(1);
+  };
+
+  async function createFlashcards(topic, n) {
+    const response = await fetch('../api/route', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic, n }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data.flashcards;
+    } else {
+        throw new Error(data.error || 'Failed to generate flashcards.');
+    }
+  };
+
+  // const handleSubmit = async () => {
+  //   if (!text.trim()) {
+  //     alert('Please enter some text to generate flashcards.')
+  //     return
+  //   }
+  
+  //   try {
+  //     const response = await fetch('/api/generate', {
+  //       method: 'POST',
+  //       body: text,
+  //     })
+  
+  //     if (!response.ok) {
+  //       throw new Error('Failed to generate flashcards')
+  //     }
+  
+  //     const data = await response.json()
+  //     setFlashCards(data.flashCards);
+  //   } catch (error) {
+  //     console.error('Error generating flashcards:', error)
+  //     alert('An error occurred while generating flashcards. Please try again.')
+  //   }
+  // }
 
   useEffect(() => {
     if (!auth.currentUser) {
       router.push('/');
     }
-  }, [user]);
+
+    if (flashCards) {
+
+    }
+  }, [user, flashCards]);
 
   const logTheUserOut = () => {
       signOut(auth);
@@ -98,14 +174,53 @@ const page = () => {
           </Toolbar>
         </AppBar>
 
-        <FlashCardGenerationForm/>
+        <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '80vh', transform: `translateX(1.25%)`,}} align='center'>
+            <Grid item xs={12} sm={8} md={6} lg={4}>
+              <Paper elevation={10} style={{ padding: 24 }}>
+                <Typography variant="h4" style={{ paddingBottom: 10 }}>
+                  Flashcard Content
+                </Typography>
+                
+                <Grid container spacing={2} style={{transform: `translateX(2.5%)`,}}>
+                
+                  <Grid item xs={12}>
+                      <TextField className={classes.field} label="Topic" onChange={(e) => setTopic(e.target.value)} variant="outlined" color="primary" fullWidth value={topic} placeholder='Enter Title' autoComplete="off" required error={topicError}/>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                      <TextField className={classes.field} type="number" label="Number" onChange={(e) => setNumberOfFlashcards(e.target.value)} variant="outlined" color="primary" fullWidth value={numberOfFlashcards} placeholder='Enter a number' autoComplete="off" required error={numberOfFlashcardsError}/>
+                  </Grid>
+
+
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained" color="primary" fullWidth onClick={handleGenerate}>
+                      {'Generate'}
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+        </Grid>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
             {flashCards.map((flashCard) => (
-                <Grid item key={crypto.randomUUID()}>
-                  <ItemCard/>
-                </Grid>
-            ))}
+                <Card key={card.id} variant="outlined" sx={{ margin: 2 }}>
+                  <CardContent>
+                    <Typography variant="h6" component="div">
+                      Flashcard {card.id} - Front
+                    </Typography>
+                    <Typography variant="body1" sx={{ marginTop: 1 }}>
+                      {card.front}
+                    </Typography>
+                    <Typography variant="h6" component="div" sx={{ marginTop: 2 }}>
+                      Flashcard {card.id} - Back
+                    </Typography>
+                    <Typography variant="body1" sx={{ marginTop: 1 }}>
+                      {card.back}
+                    </Typography>
+                  </CardContent>
+                </Card>
+            ))}   
         </Grid>
       </motion.div>
     </Fragment>

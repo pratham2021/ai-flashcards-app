@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import { Button, Grid, Paper, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { generateFlashcard, generateFlashcards } from '../app/api/generation.js'
+import page from '../app/dashboard/page.jsx';
 
 const useStyles = makeStyles({
   field: {
@@ -11,35 +13,56 @@ const useStyles = makeStyles({
 const FlashCardGenerationForm = () => {
 
   const [topic, setTopic] = useState('');
+  const [numberOfFlashcards, setNumberOfFlashcards] = useState(1);
 
   const classes = useStyles();
+
   const [topicError, setTopicError] = useState(false);
+  const [numberOfFlashcardsError, setNumberOfFlashcardsError] = useState(false);
 
-  const openai = require('openai');
-
-  openai.apiKey = process.env.OPENAI_API_KEY;
-
-  async function generateFlashcard(topic) {
-    const prompt = `Generate `;
-  }
-
-
-  const generateFlashcards = async (event) => {
+  const handleGenerate = async (event) => {
     event.preventDefault();
 
-    if (title == '' || !title) {
+    if (!topic) {
       setTopicError(true);
     }
 
-    if (title && body) {
+    if (!numberOfFlashcards) {
+      setNumberOfFlashcardsError(true);
+    }
+
+    if (topic && numberOfFlashcards) {
       setTopicError(false);
+      setNumberOfFlashcardsError(false);
 
-      // Generate the flashcards with OpenAI API
-
+      // Generate the flashcards with the OpenAI API
+      try {
+        const generatedFlashcards = await createFlashcards(topic, numberOfFlashcards);
+        
+      } catch (error) {
+        console.error(error.message);
+      }
     }
 
     setTitle('');
     setBody('');
+  };
+
+  async function createFlashcards(topic, n) {
+    const response = await fetch('../app/api/route.js', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic, n }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data.flashcards;
+    } else {
+        throw new Error(data.error || 'Failed to generate flashcards.');
+    }
   };
   
   return (
@@ -57,7 +80,12 @@ const FlashCardGenerationForm = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary" fullWidth onClick={generateFlashcards}>
+                <TextField className={classes.field} type="number" label="Number" onChange={(e) => setNumberOfFlashcards(e.target.value)} variant="outlined" color="primary" fullWidth value={numberOfFlashcards} placeholder='Enter a number' autoComplete="off" required error={numberOfFlashcardsError}/>
+            </Grid>
+
+
+            <Grid item xs={12}>
+              <Button type="submit" variant="contained" color="primary" fullWidth onClick={handleGenerate}>
                 {'Generate'}
               </Button>
             </Grid>
