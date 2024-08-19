@@ -1,5 +1,5 @@
 'use client'
-import React, {Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { AppBar, Box, Grid, Toolbar, Typography } from "@mui/material";
 import { app, auth, db } from "../../firebase"
 import { useRouter } from 'next/navigation';
@@ -40,7 +40,7 @@ const page = () => {
       }
   
       const data = await response.json()
-      setFlashcards(data)
+      setFlashCards(data);
     } catch (error) {
       console.error('Error generating flashcards:', error)
       alert('An error occurred while generating flashcards. Please try again.')
