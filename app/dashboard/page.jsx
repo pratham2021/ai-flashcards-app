@@ -14,7 +14,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import ItemCard from '../../components/ItemCard';
 import { motion } from 'framer-motion';
-
+import FlashCardGenerationForm from '../../components/FlashCardGenerationForm';
 
 const page = () => {
   
@@ -97,6 +97,8 @@ const page = () => {
             </Box>
           </Toolbar>
         </AppBar>
+
+        <FlashCardGenerationForm/>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
             {flashCards.map((flashCard) => (
