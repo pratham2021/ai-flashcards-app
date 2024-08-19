@@ -186,7 +186,7 @@ const page = () => {
                   </Grid>
 
                   <Grid item xs={12}>
-                      <TextField className={classes.field} type="number" label="Number" onChange={(e) => setNumberOfFlashcards(e.target.value)} variant="outlined" color="primary" fullWidth value={numberOfFlashcards} placeholder='Enter a number' autoComplete="off" required error={numberOfFlashcardsError}/>
+                      <TextField className={classes.field} type="text" label="Number" onChange={(e) => setNumberOfFlashcards(e.target.value)} variant="outlined" color="primary" fullWidth value={numberOfFlashcards} placeholder='Enter a number' autoComplete="off" required error={numberOfFlashcardsError}/>
                   </Grid>
 
 
