@@ -41,64 +41,6 @@ const page = () => {
 
   const classes = useStyles();
 
-  // const handleGenerate = async (event) => {
-  //   event.preventDefault();
-
-  //   if (!topic.trim()) {
-  //     alert('Please enter some text to generate flashcards.');
-  //     return;
-  //   }
-
-  //   if (isNaN(numberOfFlashcards)) {
-  //     alert('Please enter a number to be able to generate flashcards.')
-  //     return;
-  //   }
-
-  //   if (!topic) {
-  //     setTopicError(true);
-  //   }
-
-  //   if (!numberOfFlashcards) {
-  //     setNumberOfFlashcardsError(true);
-  //   }
-
-  //   if (topic && numberOfFlashcards) {
-  //     setTopicError(false);
-  //     setNumberOfFlashcardsError(false);
-
-  //     // Generate the flashcards with the OpenAI API
-  //     const response = await fetch(`/api/flashcards?topic=${encodeURIComponent(topic)}&count=${numberOfFlashcards}`);
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setFlashcards(data);
-  //     } else {
-  //       console.error("Failed to generate flashcards.");
-  //     }
-  //   }
-
-  //   console.log(flashcards.length);
-  //   setTopic('');
-  //   setNumberOfFlashcards(1);
-  // };
-
-  // async function createFlashcards(topic, n) {
-  //   const response = await fetch("../api/route", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ topic, n }),
-  //   });
-
-  //   const data = await response.json();
-  //   if (response.ok) {
-  //     return data.flashcards;
-  //   } else {
-  //     throw new Error(data.error || "Failed to generate flashcards.");
-  //   }
-  // }
-
   const handleSubmit = async () => {
     if (!text.trim()) {
       alert("Please enter some text to generate flashcards.");
