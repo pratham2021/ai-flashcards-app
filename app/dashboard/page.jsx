@@ -12,7 +12,7 @@ import RecentActorsIcon from '@mui/icons-material/RecentActors';
 import LoginIcon from '@mui/icons-material/Login';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import ItemCard from '../ItemCard';
+import ItemCard from '../../components/ItemCard';
 import { motion } from 'framer-motion';
 
 

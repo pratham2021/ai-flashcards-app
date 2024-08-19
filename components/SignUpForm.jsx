@@ -4,7 +4,7 @@ import { Button, Grid, Paper, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateUserWithEmailAndPassword, useAuthState } from 'react-firebase-hooks/auth';
-import { app, auth, db } from "./firebase"
+import { app, auth, db } from "../firebase"
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 
 const SignUpForm = () => {

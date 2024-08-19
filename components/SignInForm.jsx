@@ -4,7 +4,7 @@ import { Button, Grid, Paper, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSignInWithEmailAndPassword, useAuthState } from 'react-firebase-hooks/auth';
-import { app, auth } from "./firebase";
+import { app, auth, db } from "../firebase.js";
 
 const SignInForm = () => {
 
@@ -55,7 +55,7 @@ const SignInForm = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      router.push('/dashboard');
+      router.push('/app/dashboard');
     } catch (error) {
       setError('An error occured. Please try again.');
     }
