@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSignInWithEmailAndPassword, useAuthState } from 'react-firebase-hooks/auth';
 import { app, auth, db } from "../firebase.js";
+import { signInWithEmailLink } from '@firebase/auth';
 
 const SignInForm = () => {
 
@@ -45,6 +46,7 @@ const SignInForm = () => {
     }
 
     setError('');
+    setErrors({ email: '', password: '' });
 
     try {
       const res = await signInWithEmailAndPassword(email, password);

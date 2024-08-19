@@ -47,7 +47,7 @@ const page = () => {
   };
 
   useEffect(() => {
-    if (!auth.currentUser) {
+    if (!auth.currentUser || !user) {
       router.push("/");
     }
   }, [user]);
