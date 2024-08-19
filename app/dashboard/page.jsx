@@ -26,20 +26,12 @@ import { motion } from "framer-motion";
 import { makeStyles } from "@mui/styles";
 import Flashcard from "../../components/Flashcard";
 
-const useStyles = makeStyles({
-  field: {
-    display: "block",
-  },
-});
-
 const page = () => {
   const [user] = useAuthState(auth);
 
   const [text, setText] = useState("");
   const router = useRouter();
   const [flashcards, setFlashcards] = useState([]);
-
-  const classes = useStyles();
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -58,7 +50,7 @@ const page = () => {
       }
 
       const data = await response.json();
-      setFlashCards(data.flashCards);
+      setFlashcards(data.flashCards);
     } catch (error) {
       console.error("Error generating flashcards:", error);
       alert("An error occurred while generating flashcards. Please try again.");
@@ -131,7 +123,7 @@ const page = () => {
 
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton
-                sx={{ marginLeft: "auto", marginRight: "10px" }}
+                sx={{ marginLeft: "auto", marginRight: "5px" }}
                 className="hidden-on-load"
                 variant="contained"
                 style={{ color: "#ffffff" }}
@@ -140,7 +132,7 @@ const page = () => {
                 <LoginIcon />
               </IconButton>
               <IconButton
-                sx={{ marginLeft: "10px", marginRight: "-5px" }}
+                sx={{ marginLeft: "10px", marginRight: "-0px" }}
                 className="hidden-on-load"
                 variant="contained"
                 style={{ color: "#ffffff" }}
@@ -178,7 +170,6 @@ const page = () => {
               >
                 <Grid item xs={12}>
                   <TextField
-                    className={classes.field}
                     label="Topic"
                     onChange={(e) => setText(e.target.value)}
                     color="primary"
@@ -209,13 +200,12 @@ const page = () => {
           </Grid>
         </Grid>
 
-        {flashcards.map((flashcard, index) => (
-          <Flashcard
-            key={index}
-            question={flashcard.question}
-            answer={flashcard.answer}
-          />
-        ))}
+        <Grid container spacing={5} style={{ padding: 30 }}>
+            {flashcards.map((flashcard, index) => (
+              <Flashcard key={index} question={flashcard.question} answer={flashcard.answer}/>
+            ))}
+        </Grid>
+
       </motion.div>
     </Fragment>
   );
