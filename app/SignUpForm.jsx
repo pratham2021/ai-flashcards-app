@@ -16,8 +16,12 @@ const SignUpForm = () => {
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({ email: '', firstName: '', lastName: '', password: '' });
   const router = useRouter();
-
+  const [user] = useAuthState(auth);
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
+
+  if (user) {
+    router.push('/dashboard');
+  }
 
   async function addDocument(docId, data) {
     try {

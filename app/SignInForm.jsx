@@ -14,6 +14,11 @@ const SignInForm = () => {
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
+  const [user] = useAuthState(auth);
+
+  if (user) {
+    router.push('/dashboard');
+  }
 
   const validate = () => {
     let isValid = true;
@@ -41,23 +46,15 @@ const SignInForm = () => {
 
     setError('');
 
-    // Authenticate the user
     try {
       const res = await signInWithEmailAndPassword(email, password);
-      sessionStorage.setItem('user', true);
       setEmail('');
       setPassword('');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push('/dashboard');
     }
     catch (e) {
       setError(e);
-    }
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      router.push('/dashboard');
-    } catch (error) {
-      setError('An error occured. Please try again.');
     }
   };
 

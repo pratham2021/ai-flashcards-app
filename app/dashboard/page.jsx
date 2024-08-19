@@ -1,15 +1,6 @@
 "use client";
 import React, { Fragment, useEffect, useState } from "react";
-import {
-  AppBar,
-  Button,
-  Paper,
-  TextField,
-  Box,
-  Grid,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { AppBar, Button, Paper, TextField, Box, Grid, Toolbar, Typography } from "@mui/material";
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { signOut, deleteUser } from "firebase/auth";
@@ -21,9 +12,7 @@ import RecentActorsIcon from "@mui/icons-material/RecentActors";
 import LoginIcon from "@mui/icons-material/Login";
 import firebase from "firebase/app";
 import "firebase/auth";
-import ItemCard from "../../components/ItemCard";
 import { motion } from "framer-motion";
-import { makeStyles } from "@mui/styles";
 import Flashcard from "../../components/Flashcard";
 
 const page = () => {
@@ -40,7 +29,7 @@ const page = () => {
     }
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch("../api/generate/route.js", {
         method: "POST",
         body: text,
       });
@@ -201,9 +190,9 @@ const page = () => {
         </Grid>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
-            {flashcards.map((flashcard, index) => (
+            {Array.isArray(flashcards) &&  (flashcards.map((flashcard, index) => (
               <Flashcard key={index} question={flashcard.question} answer={flashcard.answer}/>
-            ))}
+            )))}
         </Grid>
 
       </motion.div>
