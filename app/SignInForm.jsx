@@ -55,7 +55,7 @@ const SignInForm = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      router.push('../app/dashboard');
+      router.push('/dashboard');
     } catch (error) {
       setError('An error occured. Please try again.');
     }
