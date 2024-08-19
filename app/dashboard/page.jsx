@@ -15,7 +15,7 @@ import 'firebase/auth';
 import ItemCard from '../../components/ItemCard';
 import { motion } from 'framer-motion';
 import { makeStyles } from '@mui/styles';
-import { generateFlashcard, generateFlashcards } from '../api/generation';
+import Flashcard from '../../components/Flashcard';
 
 const useStyles = makeStyles({
   field: {
@@ -32,13 +32,12 @@ const page = () => {
 
   const [topic, setTopic] = useState('');
   const [numberOfFlashcards, setNumberOfFlashcards] = useState(1);
+  const [flashcards, setFlashcards] = useState([]);
 
   const classes = useStyles();
 
   const [topicError, setTopicError] = useState(false);
   const [numberOfFlashcardsError, setNumberOfFlashcardsError] = useState(false);
-
-  const [flashCards, setFlashCards] = useState([]);
 
   const handleGenerate = async (event) => {
     event.preventDefault();
@@ -48,7 +47,7 @@ const page = () => {
       return;
     }
 
-    if (!numberOfFlashcards.trim()) {
+    if (isNaN(numberOfFlashcards)) {
       alert('Please enter a number to be able to generate flashcards.')
       return;
     }
@@ -66,34 +65,37 @@ const page = () => {
       setNumberOfFlashcardsError(false);
 
       // Generate the flashcards with the OpenAI API
-      try {
-        const generatedFlashcards = await createFlashcards(topic, numberOfFlashcards);
-        setFlashCards(generatedFlashcards);
-      } catch (error) {
-        console.error(error.message);
+      const response = await fetch(`/api/flashcards?topic=${encodeURIComponent(topic)}&count=${numberOfFlashcards}`);
+
+      if (response.ok) {
+        const data = await response.json(); 
+        setFlashcards(data);
+      } else {
+        console.error("Failed to generate flashcards.");
       }
     }
 
+    console.log(flashcards.length);
     setTopic('');
     setNumberOfFlashcards(1);
   };
 
-  async function createFlashcards(topic, n) {
-    const response = await fetch('../api/route', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ topic, n }),
-    });
+  // async function createFlashcards(topic, n) {
+  //   const response = await fetch('../api/route', {
+  //       method: 'POST',
+  //       headers: {
+  //           'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ topic, n }),
+  //   });
 
-    const data = await response.json();
-    if (response.ok) {
-        return data.flashcards;
-    } else {
-        throw new Error(data.error || 'Failed to generate flashcards.');
-    }
-  };
+  //   const data = await response.json();
+  //   if (response.ok) {
+  //       return data.flashcards;
+  //   } else {
+  //       throw new Error(data.error || 'Failed to generate flashcards.');
+  //   }
+  // };
 
   // const handleSubmit = async () => {
   //   if (!text.trim()) {
@@ -123,11 +125,7 @@ const page = () => {
     if (!auth.currentUser) {
       router.push('/');
     }
-
-    if (flashCards) {
-
-    }
-  }, [user, flashCards]);
+  }, [user]);
 
   const logTheUserOut = () => {
       signOut(auth);
@@ -202,26 +200,9 @@ const page = () => {
             </Grid>
         </Grid>
 
-        <Grid container spacing={5} style={{ padding: 30 }}>
-            {flashCards.map((flashCard) => (
-                <Card key={card.id} variant="outlined" sx={{ margin: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" component="div">
-                      Flashcard {card.id} - Front
-                    </Typography>
-                    <Typography variant="body1" sx={{ marginTop: 1 }}>
-                      {card.front}
-                    </Typography>
-                    <Typography variant="h6" component="div" sx={{ marginTop: 2 }}>
-                      Flashcard {card.id} - Back
-                    </Typography>
-                    <Typography variant="body1" sx={{ marginTop: 1 }}>
-                      {card.back}
-                    </Typography>
-                  </CardContent>
-                </Card>
-            ))}   
-        </Grid>
+        {flashcards.map((flashcard, index) => (
+          <Flashcard key={index} question={flashcard.question} answer={flashcard.answer} />
+        ))}
       </motion.div>
     </Fragment>
   )
