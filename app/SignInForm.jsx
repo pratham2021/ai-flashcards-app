@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSignInWithEmailAndPassword, useAuthState } from 'react-firebase-hooks/auth';
 import { app, auth, db } from "../firebase.js";
-import { signInWithEmailLink } from '@firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const SignInForm = () => {
 
@@ -13,7 +13,6 @@ const SignInForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
   const [user] = useAuthState(auth);
 
@@ -49,9 +48,16 @@ const SignInForm = () => {
     setErrors({ email: '', password: '' });
 
     try {
-      const res = await signInWithEmailAndPassword(email, password);
-      setEmail('');
-      setPassword('');
+      signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+        setEmail('');
+        setPassword('');
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log('Error signing in:');
+      });
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
       router.push('/dashboard');
     }
