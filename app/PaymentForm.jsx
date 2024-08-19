@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import { PremiumPanel } from "./premiumPanel";
 import { StandardPanel } from "./standardPanel";
 import { useEffect, useState } from "react";
-import { initFirebase } from "@/firebase";
 import { getAuth } from "firebase/auth";
 import { getCheckoutUrl, getPortalUrl } from "./stripePayment";
 import { getPremiumStatus } from "./getPremiumStatus";
@@ -13,7 +12,6 @@ import { Button, Box } from '@mui/material';
 const PaymentForm = () => {
 
   const payToUse = async () => {
-
     console.log("Nothing in this world comes free");
   };
 

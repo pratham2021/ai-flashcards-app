@@ -2,7 +2,7 @@
 import React, { Fragment, useState } from "react";
 import { AppBar, Box, Toolbar, Button, Typography } from "@mui/material";
 import RecentActorsIcon from '@mui/icons-material/RecentActors';
-import SignInForm from "../components/SignUpForm";
+import SignInForm from "../components/SignInForm";
 import SignUpForm from "../components/SignUpForm";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../firebase"
@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function Home() {
-  const [signInPressed, setSignInPressed] = useState(true);
+  const [signInPressed, setSignInPressed] = useState(false);
   const [signUpPressed, setSignUpPressed] = useState(false);
 
   const firstFunction = () => {
@@ -53,9 +53,7 @@ export default function Home() {
                     </Toolbar>
                 </AppBar>
 
-                {!user ? (!signInPressed && !signUpPressed ? (<></>):(
-                    signInPressed ? (<SignInForm/>): (signUpPressed ? (<SignUpForm/>): (<></>))
-                )) : (<></>)}
+                {!user && (!signInPressed && !signUpPressed ? (<SignUpForm/>) : (signInPressed ? (<SignInForm/>) : (<SignUpForm/>)))}
             </motion.div>
         </Fragment>
   );
