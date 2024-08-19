@@ -12,7 +12,8 @@ import { Button, Box } from '@mui/material';
 
 const PaymentForm = () => {
 
-  const upgradeToPremium = async () => {
+  const payToUse = async () => {
+
     console.log("Nothing in this world comes free");
   };
 
