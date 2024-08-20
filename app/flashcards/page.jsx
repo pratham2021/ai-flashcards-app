@@ -57,12 +57,6 @@ export default function Flashcards() {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     getFlashcards(user.uid);
-  //   }
-  // }, [user]);
-
   const getFlashcards = async (uuid) => {
     const docRef = db.collection("users").doc(uuid);
     const subcollectionRef = docRef.collection('flashcardSets');
