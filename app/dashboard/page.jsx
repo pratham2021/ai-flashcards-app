@@ -259,9 +259,9 @@ const page = () => {
         </Grid>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
-            {Array.isArray(flashcards) &&  (storageFlashcards.map((storageFlashcard, index) => (
-              <Flashcard key={index} question={storageFlashcard.question} answer={storageFlashcard.answer}/>
-            )))}
+            {storageFlashcards.map((storageFlashcard, index) => (
+              <Flashcard key={index} question={storageFlashcard["question"]} answer={storageFlashcard["answer"]}/>
+            ))}
         </Grid>
 
       </motion.div>
