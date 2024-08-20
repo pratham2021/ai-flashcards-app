@@ -29,18 +29,22 @@ const page = () => {
     }
 
     try {
-      const response = await fetch("../api/generate/route.js", {
+      const response = await fetch(`../api/generate/route.js`, {
         method: "POST",
-        body: text,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text })
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate flashcards");
+        console.log(response);
       }
 
       const data = await response.json();
-      setFlashcards(data.flashCards);
+      setFlashcards(data.flashcards);
     } catch (error) {
+
       console.error("Error generating flashcards:", error);
       alert("An error occurred while generating flashcards. Please try again.");
     }
@@ -112,7 +116,7 @@ const page = () => {
 
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton
-                sx={{ marginLeft: "auto", marginRight: "5px" }}
+                sx={{ marginLeft: "auto" }}
                 className="hidden-on-load"
                 variant="contained"
                 style={{ color: "#ffffff" }}
@@ -121,7 +125,7 @@ const page = () => {
                 <LoginIcon />
               </IconButton>
               <IconButton
-                sx={{ marginLeft: "10px", marginRight: "-0px" }}
+                sx={{ marginLeft: "10px", marginRight: "-10px" }}
                 className="hidden-on-load"
                 variant="contained"
                 style={{ color: "#ffffff" }}
@@ -190,9 +194,9 @@ const page = () => {
         </Grid>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
-            {Array.isArray(flashcards) &&  (flashcards.map((flashcard, index) => (
+            {flashcards.map((flashcard, index) => (
               <Flashcard key={index} question={flashcard.question} answer={flashcard.answer}/>
-            )))}
+            ))}
         </Grid>
 
       </motion.div>

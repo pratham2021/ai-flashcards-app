@@ -63,6 +63,7 @@ const SignInForm = () => {
     }
     catch (e) {
       setError(e);
+      alert(e);
     }
   };
 
