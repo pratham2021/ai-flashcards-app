@@ -35,12 +35,12 @@ import RecentActorsIcon from "@mui/icons-material/RecentActors";
 import LoginIcon from "@mui/icons-material/Login";
 import GridViewIcon from '@mui/icons-material/GridView';
 import firebase from "firebase/app";
-import "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { motion } from "framer-motion";
 import moment from 'moment-timezone';
 
 const page = () => {
-  const [user] = useAuthState(auth);
+  const [user, setUser] = useState(null);
 
   const [text, setText] = useState("");
   const router = useRouter();
@@ -79,11 +79,16 @@ const page = () => {
   };
 
   useEffect(() => {
-    if (!auth.currentUser || !user) {
-      router.push("/");
-    }
-    
-  }, [user]);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        console.log("Logged in!");
+      } else {
+        setUser(null);
+        router.push("/");
+      }
+    });
+  }, []);
 
   // useEffect(() => {
   //   const fetchFlashcards = async () => {
