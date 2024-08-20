@@ -11,7 +11,8 @@ import {
   Typography,
   Card,
   CardContent,
-  Container
+  CardActionArea,
+  Container,
 } from "@mui/material";
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
@@ -29,38 +30,48 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RecentActorsIcon from "@mui/icons-material/RecentActors";
 import LoginIcon from "@mui/icons-material/Login";
-import GridViewIcon from '@mui/icons-material/GridView';
+import GridViewIcon from "@mui/icons-material/GridView";
 import firebase from "firebase/app";
-import "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { motion } from "framer-motion";
 
 export default function Flashcards() {
-  const [user] = useAuthState(auth);
+  const [user, setUser] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
-    async function getFlashcards() {
-      if (!user) {
-        console.log("No user auth");
-      };
-      const docRef = doc(collection(db, "users"), user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const collections = docSnap.data().flashcards || [];
-        setFlashcards(collections);
-        console.log("Exists!");
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
       } else {
-        await setDoc(docRef, { flashcards: [] });
-        console.log("No sets");
+        setUser(null);
+        router.push("/");
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      getFlashcards(user.uid);
     }
-    getFlashcards();
   }, [user]);
+
+  const getFlashcards = async (uuid) => {
+    const docRef = doc(collection(db, "users"), uuid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const collections = docSnap.data().flashcards || [];
+      setFlashcards(collections);
+    } else {
+      await setDoc(docRef, { flashcards: [] });
+      setFlashcards([]);
+    }
+  };
 
   const handleCardClick = (id) => {
     router.push(`/flashcard?id=${id}`);
-  }
+  };
 
   const wipeClean = async () => {
     const userToDelete = auth.currentUser;
@@ -105,8 +116,14 @@ export default function Flashcards() {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <IconButton sx={{ marginLeft: "-10px", marginRight: "auto" }} className="hidden-on-load" variant="contained" style={{ color: "#ffffff" }} onClick={goToDashboard}>
-                <RecentActorsIcon/>
+              <IconButton
+                sx={{ marginLeft: "-10px", marginRight: "auto" }}
+                className="hidden-on-load"
+                variant="contained"
+                style={{ color: "#ffffff" }}
+                onClick={goToDashboard}
+              >
+                <RecentActorsIcon />
               </IconButton>
             </Box>
 
