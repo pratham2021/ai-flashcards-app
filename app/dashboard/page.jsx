@@ -16,12 +16,7 @@ import {
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { signOut, deleteUser } from "firebase/auth";
-import {
-  deleteDoc,
-  doc,
-  listCollections,
-  collection,
-} from "firebase/firestore";
+import { deleteDoc, doc, listCollections, collection, setDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -32,6 +27,8 @@ import "firebase/auth";
 import { motion } from "framer-motion";
 import Flashcard from "../../components/Flashcard";
 import moment from 'moment-timezone';
+import { format } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 
 const page = () => {
   const [user] = useAuthState(auth);
@@ -58,7 +55,6 @@ const page = () => {
       }
 
       const data = await response.json();
-      setFlashcards(data);
       storeFlashcards(data);
       setText("");
     } catch (error) {
@@ -71,7 +67,8 @@ const page = () => {
     if (!auth.currentUser || !user) {
       router.push("/");
     }
-  }, [user]);
+
+  }, [user, storageFlashcards]);
 
   const logTheUserOut = () => {
     signOut(auth);
@@ -81,16 +78,21 @@ const page = () => {
   const storeFlashcards = async (cardsToStore) => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const now = moment.tz(timezone);
-    const formattedTimestamp = now.format('MMMM D, YYYY HH:mm:ss z');
+    const formattedTimestamp = now.format('MMMM D, YYYY hh:mm:ss A z');
 
     const docRef = doc(db, user.uid, "flashcards");
 
     const subCollectionRef = collection(docRef, formattedTimestamp);
 
-    cardsToStore.forEach(async (card, index) => {
-      const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
+    cardsToStore.map(async (card, index) => {
+      try {
+        const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
 
-      await setDoc(subDocRef, card);
+        await setDoc(subDocRef, card);
+      }
+      catch (error) {
+        console.error('Error writing document: ');
+      }
     });
 
     try {
@@ -104,15 +106,15 @@ const page = () => {
   };
 
   const retrieveFlashcards = async () => {
-    const docRef = doc(db, user.uid, "flashcards");
+    let docRef = doc(db, user.uid, "flashcards");
 
     try {
-      const subcollections = await listCollections(docRef);
+      let subcollections = await listCollections(docRef);
 
-      const allFlashCards = [];
-      const flashCardsData = [];
+      let allFlashCards = [];
+      let flashCardsData = [];
 
-      for (const subcollection of subcollections) {
+      for (let subcollection of subcollections) {
         const subCollectionRef = collection(docRef, subcollection.id);
 
         const querySnapshot = await getDocs(subCollectionRef);
@@ -127,14 +129,13 @@ const page = () => {
         });
 
         allFlashCards.push(flashCardsData);
-        flashCardsData.splice(0, flashCardsData.length);
-
+        flashCardsData = [];
       }
 
       setStorageFlashcards(allFlashCards);
     }
     catch (error) {
-      alert("Error retrieving flashcards.")
+
     }
   }
 
@@ -270,13 +271,13 @@ const page = () => {
           </Grid>
         </Grid>
 
-        {flashcards.length > 0 && (
+        {storageFlashcards.length > 0 && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h5" component="h2" gutterBottom>
               Generated Flashcards
             </Typography>
             <Grid container spacing={2}>
-              {flashcards.map((flashcard, index) => (
+              {storageFlashcards.map((flashcard, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card>
                     <CardContent>
