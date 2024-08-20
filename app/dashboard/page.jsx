@@ -61,7 +61,7 @@ const page = () => {
       setFlashcards(data);
       alert("Flashcards generated");
       console.log(data);
-      // storeFlashcards(flashcards);
+      storeFlashcards(data);
       setText("");
     } catch (error) {
       console.error("Error generating flashcards:", error);
@@ -92,12 +92,7 @@ const page = () => {
     cardsToStore.forEach(async (card, index) => {
       const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
 
-      await setDoc(subDocRef, {
-        topic: "",
-        question: "",
-        answer: "",
-        flipped: false,
-      });
+      await setDoc(subDocRef, card);
     });
 
     try {
