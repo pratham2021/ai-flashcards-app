@@ -59,6 +59,8 @@ const page = () => {
     router.push("/");
   };
 
+
+
   const wipeClean = async () => {
     const userToDelete = auth.currentUser;
 
