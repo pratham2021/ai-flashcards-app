@@ -16,7 +16,7 @@ import {
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { signOut, deleteUser } from "firebase/auth";
-import { deleteDoc, doc, listCollections, collection, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, collection, setDoc, collectionGroup, subcollections } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -37,6 +37,7 @@ const page = () => {
   const router = useRouter();
   const [flashcards, setFlashcards] = useState([]);
   const [storageFlashcards, setStorageFlashcards] = useState([]);
+
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -67,8 +68,17 @@ const page = () => {
     if (!auth.currentUser || !user) {
       router.push("/");
     }
+    
+  }, [user]);
 
-  }, [user, storageFlashcards]);
+  // useEffect(() => {
+  //   const fetchFlashcards = async () => {
+  //     await retrieveFlashcards();
+  //   };
+  //   fetchFlashcards();
+  //   const intervalId = setInterval(fetchFlashcards, 1000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   const logTheUserOut = () => {
     signOut(auth);
@@ -99,6 +109,8 @@ const page = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       setFlashcards([]);
+
+      retrieveFlashcards();
     }
     catch (error) {
       console.log("Error clearing an array!")
@@ -106,36 +118,35 @@ const page = () => {
   };
 
   const retrieveFlashcards = async () => {
-    let docRef = doc(db, user.uid, "flashcards");
+    const docRef = doc(db, user.uid, "flashcards");
 
     try {
       let subcollections = await listCollections(docRef);
-
+  
       let allFlashCards = [];
-      let flashCardsData = [];
-
+    
       for (let subcollection of subcollections) {
         const subCollectionRef = collection(docRef, subcollection.id);
-
         const querySnapshot = await getDocs(subCollectionRef);
-
+    
+        let flashCardsData = [];
+    
         querySnapshot.forEach(doc => {
           const documentData = {
             id: doc.id,
             ...doc.data()
           };
-
+    
           flashCardsData.push(documentData);
         });
-
-        allFlashCards.push(flashCardsData);
-        flashCardsData = [];
+    
+        allFlashCards.push({ subcollectionId: subcollection.id, cards: flashCardsData });
       }
-
+    
       setStorageFlashcards(allFlashCards);
     }
     catch (error) {
-
+      console.log("Flashcard Retrieval Failed")
     }
   }
 
@@ -277,16 +288,16 @@ const page = () => {
               Generated Flashcards
             </Typography>
             <Grid container spacing={2}>
-              {storageFlashcards.map((flashcard, index) => (
+              {storageFlashcards.map((storageFlashcard, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card>
                     <CardContent>
                       <Typography variant="h6">Front:</Typography>
-                      <Typography>{flashcard.front}</Typography>
+                      <Typography>{storageFlashcard["front"]}</Typography>
                       <Typography variant="h6" sx={{ mt: 2 }}>
                         Back:
                       </Typography>
-                      <Typography>{flashcard.back}</Typography>
+                      <Typography>{storageFlashcard["back"]}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
