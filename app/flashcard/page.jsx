@@ -22,6 +22,7 @@ import {
   getDoc,
   setDoc,
   listCollections,
+  getDocs,
   collection,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
