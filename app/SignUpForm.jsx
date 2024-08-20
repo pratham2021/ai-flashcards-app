@@ -28,7 +28,7 @@ const SignUpForm = () => {
       const docRef = doc(db, "users", docId);
       await setDoc(docRef, data);
     } catch (e) {
-      setError("Error saving you the database");
+      setError("Error saving you to the database");
     }
   }
 
@@ -85,6 +85,7 @@ const SignUpForm = () => {
         setPassword('');
     } catch (e) {
         setError(e);
+        alert(e);
     }
 
     try {
