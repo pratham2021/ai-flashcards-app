@@ -20,9 +20,6 @@ import { signOut, deleteUser } from "firebase/auth";
 import {
   deleteDoc,
   doc,
-  getDoc,
-  setDoc,
-  listCollections,
   collection,
   getDocs
 } from "firebase/firestore";
@@ -44,39 +41,31 @@ export default function Flashcards() {
   const [userUniqueIdentification, setUserUniqueIdentification] = useState("");
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        console.log("User ID: " + user.uid);
-        setUserUniqueIdentification(user.uid);
-        getFlashcards(userUniqueIdentification);
+        const docRef = doc(db, "users", user.uid);
+        const collectionRef = collection(docRef, "flashcardSets"); // this has to point to the flashcardSets collection
+
+        const snapshots = await getDocs(collectionRef);
+
+        const documents = snapshots.docs.map((doc) => {
+          const documentData = doc.data().flashcards;
+          
+          console.log(documentData[0]["front"]);
+          console.log(documentData[0]["back"]);
+
+          console.log(documentData[1]["front"]);
+          console.log(documentData[1]["back"]);
+        });
+
+        console.log(documents.length);
       } else {
         setUser(null);
         router.push("/");
       }
     });
   }, []);
-
-  const getFlashcards = async (uuid) => {
-    doc
-    const docRef = doc(collection(db, "users"), uuid);
-
-    const subcollectionRef = collection(docRef, 'flashcardSets');
-
-    let newDocData = [];
-    let allData = [];
-
-    subcollectionRef.get().then(querySnapshot => {
-      querySnapshot.forEach(doc => {
-        console.log("Document Data:");
-        newDocData.push(doc.data());
-
-      });
-      allData.push([...newDocData]);
-      setFlashcards(allData);
-      newDocData = [];
-    });
-  };
 
   const handleCardClick = (id) => {
     router.push(`/flashcard?id=${id}`);
