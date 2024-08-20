@@ -59,8 +59,6 @@ const page = () => {
 
       const data = await response.json();
       setFlashcards(data);
-      alert("Flashcards generated");
-      console.log(data);
       storeFlashcards(data);
       setText("");
     } catch (error) {
