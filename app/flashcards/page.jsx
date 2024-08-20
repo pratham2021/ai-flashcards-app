@@ -24,6 +24,7 @@ import {
   setDoc,
   listCollections,
   collection,
+  getDocs
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import IconButton from "@mui/material/IconButton";
@@ -40,13 +41,15 @@ export default function Flashcards() {
   const [flashcards, setFlashcards] = useState([]);
   const router = useRouter();
   // let userUniqueIdentification = "";
+  const [userUniqueIdentification, setUserUniqueIdentification] = useState("");
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
-        // userUniqueIdentification = user.uid;
-        getFlashcards(user.uid);
+        console.log("User ID: " + user.uid);
+        setUserUniqueIdentification(user.uid);
+        getFlashcards(userUniqueIdentification);
       } else {
         setUser(null);
         router.push("/");
@@ -61,15 +64,31 @@ export default function Flashcards() {
   // }, [user]);
 
   const getFlashcards = async (uuid) => {
-    const docRef = doc(collection(db, "users"), uuid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const collections = docSnap.data().flashcards || [];
-      setFlashcards(collections);
-    } else {
-      await setDoc(docRef, { flashcards: [] });
-      setFlashcards([]);
-    }
+    const docRef = db.collection("users").doc(uuid);
+    const subcollectionRef = docRef.collection('flashcardSets');
+
+    let newDocData = [];
+    let allData = [];
+
+    subcollectionRef.get().then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        console.log("Document Data:");
+        newDocData.push(doc.data());
+
+      });
+      allData.push([...newDocData]);
+      setFlashcards(allData);
+      newDocData = [];
+    });
+
+    // const docSnap = await getDoc(docRef);
+    // if (docSnap.exists()) {
+    //   const collections = docSnap.data().flashcards || [];
+    //   setFlashcards(collections);
+    // } else {
+    //   await setDoc(docRef, { flashcards: [] });
+    //   setFlashcards([]);
+    // }
   };
 
   const handleCardClick = (id) => {
