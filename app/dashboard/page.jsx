@@ -98,24 +98,16 @@ const page = () => {
     const docRef = doc(db, user.uid, "flashcards");
 
     try {
-      // Get all subcollections within the document
       const subcollections = await listCollections(docRef);
 
       const allDocumentsData = [];
-
-      // Document all the subcollection names
       
-      // Iterate through each subcollection
       for (const subcollection of subcollections) {
         console.log(`Fetching documents from subcollection: ${subcollection.id}`);
 
-        // Reference to the current subcollection
         const subCollectionRef = collection(docRef, subcollection.id);
 
-        // Fetch all documents within the subcollection
         const querySnapshot = await getDocs(subCollectionRef);
-
-        // Iterate through each document in the subcollection
 
         querySnapshot.forEach(doc => {
           const documentData = {
