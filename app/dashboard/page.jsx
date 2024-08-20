@@ -95,8 +95,8 @@ const page = () => {
   //   try {
   //     const subcollections = await listCollections(docRef);
 
-  //     const allFlashCards = [];
-  //     const flashCardsData = []; 
+  //     let allFlashCards = [];
+  //     let flashCardsData = []; 
       
   //     for (const subcollection of subcollections) {
   //       const subCollectionRef = collection(docRef, subcollection.id);
