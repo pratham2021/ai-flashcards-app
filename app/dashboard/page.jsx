@@ -42,7 +42,7 @@ const page = () => {
       const data = await response.json();
       setFlashcards(data.flashCards);
       alert("Flashcards generated");
-      storeFlashcards(flashcards);
+      // storeFlashcards(flashcards);
       setText("");
     } catch (error) {
       console.error("Error generating flashcards:", error);
@@ -61,67 +61,68 @@ const page = () => {
     router.push("/");
   };
 
-  const storeFlashcards = async (cardsToStore) => {
-    const uniqueIdentification = crypto.randomUUID();
+  // const storeFlashcards = async (cardsToStore) => {
+  //   const uniqueIdentification = crypto.randomUUID();
 
-    const docRef = doc(db, user.uid, "flashcards");
+  //   const docRef = doc(db, user.uid, "flashcards");
     
-    const subCollectionRef = collection(docRef, uniqueIdentification);
+  //   const subCollectionRef = collection(docRef, uniqueIdentification);
     
-    cardsToStore.forEach(async (card, index) => {
-      const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
+  //   cardsToStore.forEach(async (card, index) => {
+  //     const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
 
-      await setDoc(subDocRef, {
-        topic: "",
-        question: "",
-        answer: "",
-        flipped: false,
-      });
-    });
+  //     await setDoc(subDocRef, {
+  //       topic: "",
+  //       question: "",
+  //       answer: "",
+  //       flipped: false,
+  //     });
+  //   });
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      setFlashcards([]);
-    }
-    catch (error) {
-      console.log("Error clearing an array!")
-    }
-  };
+  //     setFlashcards([]);
+  //   }
+  //   catch (error) {
+  //     console.log("Error clearing an array!")
+  //   }
+  // };
 
-  const retrieveFlashcards = async () => {
-    const docRef = doc(db, user.uid, "flashcards");
+  // const retrieveFlashcards = async () => {
+  //   const docRef = doc(db, user.uid, "flashcards");
 
-    try {
-      const subcollections = await listCollections(docRef);
+  //   try {
+  //     const subcollections = await listCollections(docRef);
 
-      const allFlashCards = [];
-      const flashCardsData = []; 
+  //     const allFlashCards = [];
+  //     const flashCardsData = []; 
       
-      for (const subcollection of subcollections) {
-        const subCollectionRef = collection(docRef, subcollection.id);
+  //     for (const subcollection of subcollections) {
+  //       const subCollectionRef = collection(docRef, subcollection.id);
 
-        const querySnapshot = await getDocs(subCollectionRef);
+  //       const querySnapshot = await getDocs(subCollectionRef);
 
-        querySnapshot.forEach(doc => {
-          const documentData = {
-            id: doc.id, 
-            ...doc.data()
-          };
+  //       querySnapshot.forEach(doc => {
+  //         const documentData = {
+  //           id: doc.id, 
+  //           ...doc.data()
+  //         };
 
-          flashCardsData.push(documentData);
-        });
+  //         flashCardsData.push(documentData);
+  //       });
 
-        allFlashCards.push(flashCardsData);
-        flashCardsData.splice(0, flashCardsData.length);
-      }
+  //       allFlashCards.push(flashCardsData);
+  //       flashCardsData.splice(0, flashCardsData.length);
 
-      setStorageFlashcards(allFlashCards);
-    }
-    catch (error) {
-      alert("Error retrieving flashcards.")
-    }
-  }
+  //     }
+
+  //     setStorageFlashcards(allFlashCards);
+  //   }
+  //   catch (error) {
+  //     alert("Error retrieving flashcards.")
+  //   }
+  // }
 
   const wipeClean = async () => {
     const userToDelete = auth.currentUser;
