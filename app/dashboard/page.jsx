@@ -11,7 +11,11 @@ import {
   Typography,
   Card,
   CardContent,
-  
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
@@ -19,7 +23,9 @@ import { signOut, deleteUser } from "firebase/auth";
 import {
   deleteDoc,
   doc,
+  getDoc,
   listCollections,
+  writeBatch,
   collection,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -27,6 +33,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RecentActorsIcon from "@mui/icons-material/RecentActors";
 import LoginIcon from "@mui/icons-material/Login";
+import GridViewIcon from '@mui/icons-material/GridView';
 import firebase from "firebase/app";
 import "firebase/auth";
 import { motion } from "framer-motion";
@@ -39,6 +46,11 @@ const page = () => {
   const router = useRouter();
   const [flashcards, setFlashcards] = useState([]);
   const [storageFlashcards, setStorageFlashcards] = useState([]);
+
+  const [setName, setSetName] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const handleOpenDialog = () => setDialogOpen(true);
+  const handleCloseDialog = () => setDialogOpen(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -58,8 +70,6 @@ const page = () => {
 
       const data = await response.json();
       setFlashcards(data);
-      alert("Flashcards generated");
-      console.log(data);
       // storeFlashcards(flashcards);
       setText("");
     } catch (error) {
@@ -79,8 +89,49 @@ const page = () => {
     router.push("/");
   };
 
+  const viewSets = () => {
+    router.push("/flashcards");
+  };
+
+  const saveFlashcards = async () => {
+    if (!setName.trim()) {
+      alert("Please enter a name for your flashcard set.");
+      return;
+    }
+
+    try {
+      const userDocRef = doc(collection(db, "users"), user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      const batch = writeBatch(db);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const updatedSets = [
+          ...(userData.flashcardSets || []),
+          { name: setName },
+        ];
+        batch.update(userDocRef, { flashcardSets: updatedSets });
+      } else {
+        batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
+      }
+
+      const setDocRef = doc(collection(userDocRef, "flashcardSets"), setName);
+      batch.set(setDocRef, { flashcards });
+
+      await batch.commit();
+
+      alert("Flashcards saved successfully!");
+      handleCloseDialog();
+      setSetName("");
+    } catch (error) {
+      console.error("Error saving flashcards:", error);
+      alert("An error occurred while saving flashcards. Please try again.");
+    }
+  };
+
   // const storeFlashcards = async (cardsToStore) => {
-  //   const uniqueIdentification = crypto.randomUUID();
+  //   const uniqueIdentification = crypto.rand3omUUID();
 
   //   const docRef = doc(db, user.uid, "flashcards");
 
@@ -197,7 +248,16 @@ const page = () => {
 
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton
-                sx={{ marginLeft: "auto", marginRight: "5px" }}
+                sx={{ marginLeft: "auto", marginRight: "10px" }}
+                className="hidden-on-load"
+                variant="contained"
+                style={{ color: "#ffffff" }}
+                onClick={viewSets}
+              >
+                <GridViewIcon />
+              </IconButton>
+              <IconButton
+                sx={{ marginLeft: "10px", marginRight: "10px" }}
                 className="hidden-on-load"
                 variant="contained"
                 style={{ color: "#ffffff" }}
@@ -241,6 +301,9 @@ const page = () => {
                 container
                 spacing={2}
                 style={{ transform: `translateX(2.5%)` }}
+                justifyContent="center"
+                alignItems="center"
+                align="center"
               >
                 <Grid item xs={12}>
                   <TextField
@@ -263,7 +326,6 @@ const page = () => {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    fullWidth
                     onClick={handleSubmit}
                   >
                     {"Generate"}
@@ -275,8 +337,13 @@ const page = () => {
         </Grid>
 
         {flashcards.length > 0 && (
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h5" component="h2" gutterBottom>
+          <Box sx={{ mt: 4 }} justifyContent="center" alignItems="center">
+            <Typography
+              variant="h5"
+              component="h2"
+              gutterBottom
+              style={{ paddingBottom: 10 }}
+            >
               Generated Flashcards
             </Typography>
             <Grid container spacing={2}>
@@ -297,6 +364,42 @@ const page = () => {
             </Grid>
           </Box>
         )}
+
+        {flashcards.length > 0 && (
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenDialog}
+            >
+              Save Flashcards
+            </Button>
+          </Box>
+        )}
+
+        <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+          <DialogTitle>Save Flashcard Set</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter a name for your flashcard set.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Set Name"
+              type="text"
+              fullWidth
+              value={setName}
+              onChange={(e) => setSetName(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={saveFlashcards} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
       </motion.div>
     </Fragment>
   );
