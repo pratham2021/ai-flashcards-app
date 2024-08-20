@@ -79,7 +79,8 @@ const page = () => {
       await setDoc(subDocRef, {
         topic: "",
         question: "",
-        answer: ""
+        answer: "",
+        flipped: false,
       });
     });
 
