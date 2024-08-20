@@ -39,11 +39,14 @@ export default function Flashcards() {
   const [user, setUser] = useState(null);
   const [flashcards, setFlashcards] = useState([]);
   const router = useRouter();
+  // let userUniqueIdentification = "";
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        // userUniqueIdentification = user.uid;
+        getFlashcards(user.uid);
       } else {
         setUser(null);
         router.push("/");
@@ -51,11 +54,11 @@ export default function Flashcards() {
     });
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      getFlashcards(user.uid);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user) {
+  //     getFlashcards(user.uid);
+  //   }
+  // }, [user]);
 
   const getFlashcards = async (uuid) => {
     const docRef = doc(collection(db, "users"), uuid);
@@ -186,7 +189,7 @@ export default function Flashcards() {
                   >
                     <CardContent>
                       <Typography variant="h5" component="div">
-                        {flashcard.name}
+                        {flashcard.front}
                       </Typography>
                     </CardContent>
                   </CardActionArea>
