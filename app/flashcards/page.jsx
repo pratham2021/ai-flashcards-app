@@ -80,15 +80,6 @@ export default function Flashcards() {
       setFlashcards(allData);
       newDocData = [];
     });
-
-    // const docSnap = await getDoc(docRef);
-    // if (docSnap.exists()) {
-    //   const collections = docSnap.data().flashcards || [];
-    //   setFlashcards(collections);
-    // } else {
-    //   await setDoc(docRef, { flashcards: [] });
-    //   setFlashcards([]);
-    // }
   };
 
   const handleCardClick = (id) => {
