@@ -45,6 +45,7 @@ export default function Flashcards() {
         console.log("No user auth");
       };
       const docRef = doc(collection(db, "users"), user.uid);
+      
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const collections = docSnap.data().flashcards || [];
