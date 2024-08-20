@@ -4,7 +4,7 @@ import { AppBar, Button, Paper, TextField, Box, Grid, Toolbar, Typography } from
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { signOut, deleteUser } from "firebase/auth";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, listCollections, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +21,7 @@ const page = () => {
   const [text, setText] = useState("");
   const router = useRouter();
   const [flashcards, setFlashcards] = useState([]);
+  const [storageFlashcards, setStorageFlashcards] = useState([]);
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -41,6 +42,7 @@ const page = () => {
       const data = await response.json();
       setFlashcards(data.flashCards);
       alert("Flashcards generated");
+      // storeFlashcards(flashcards);
       setText("");
     } catch (error) {
       console.error("Error generating flashcards:", error);
@@ -52,14 +54,85 @@ const page = () => {
     if (!auth.currentUser || !user) {
       router.push("/");
     }
-  }, [user]);
+
+    // Retrieve flashcards from Firebase
+    
+
+
+  }, [user, flashcards, storageFlashcards]);
 
   const logTheUserOut = () => {
     signOut(auth);
     router.push("/");
   };
 
+  const storeFlashcards = async (cardsToStore) => {
+    const uniqueIdentification = crypto.randomUUID();
 
+    const docRef = doc(db, user.uid, "flashcards");
+    
+    const subCollectionRef = collection(docRef, uniqueIdentification);
+    
+    cardsToStore.forEach(async (card, index) => {
+      const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
+
+      await setDoc(subDocRef, {
+        // Insert key value pairs
+        topic: "",
+        question: "",
+        answer: ""
+      });
+    });
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setFlashcards([]);
+    }
+    catch (error) {
+      console.log("Error clearing an array!")
+    }
+  };
+
+  const retrieveFlashcards = async () => {
+    const docRef = doc(db, user.uid, "flashcards");
+
+    try {
+      // Get all subcollections within the document
+      const subcollections = await listCollections(docRef);
+
+      const allDocumentsData = [];
+
+      // Document all the subcollection names
+      
+      // Iterate through each subcollection
+      for (const subcollection of subcollections) {
+        console.log(`Fetching documents from subcollection: ${subcollection.id}`);
+
+        // Reference to the current subcollection
+        const subCollectionRef = collection(docRef, subcollection.id);
+
+        // Fetch all documents within the subcollection
+        const querySnapshot = await getDocs(subCollectionRef);
+
+        // Iterate through each document in the subcollection
+
+        querySnapshot.forEach(doc => {
+          const documentData = {
+            id: doc.id, 
+            ...doc.data()
+          };
+
+          allDocumentsData.push(documentData);
+        });
+      }
+
+      setStorageFlashcards(allDocumentsData);
+    }
+    catch (error) {
+      alert("Error retrieving flashcards.")
+    }
+  }
 
   const wipeClean = async () => {
     const userToDelete = auth.currentUser;
@@ -194,8 +267,8 @@ const page = () => {
         </Grid>
 
         <Grid container spacing={5} style={{ padding: 30 }}>
-            {Array.isArray(flashcards) &&  (flashcards.map((flashcard, index) => (
-              <Flashcard key={index} question={flashcard.question} answer={flashcard.answer}/>
+            {Array.isArray(flashcards) &&  (storageFlashcards.map((storageFlashcard, index) => (
+              <Flashcard key={index} question={storageFlashcard.question} answer={storageFlashcard.answer}/>
             )))}
         </Grid>
 
