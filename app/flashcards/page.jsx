@@ -84,6 +84,10 @@ export default function Flashcards() {
     router.push("/flashcards");
   };
 
+  const goToDashboard = () => {
+    router.push("/dashboard");
+  };
+
   return (
     <Fragment>
       <motion.div
@@ -101,10 +105,9 @@ export default function Flashcards() {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <RecentActorsIcon
-                className="hidden-on-load"
-                style={{ color: "#ffffff" }}
-              />
+              <IconButton sx={{ marginLeft: "-10px", marginRight: "auto" }} className="hidden-on-load" variant="contained" style={{ color: "#ffffff" }} onClick={goToDashboard}>
+                <RecentActorsIcon/>
+              </IconButton>
             </Box>
 
             <Box
