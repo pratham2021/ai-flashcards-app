@@ -25,10 +25,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { motion } from "framer-motion";
-import Flashcard from "../../components/Flashcard";
 import moment from 'moment-timezone';
-import { format } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
 
 const page = () => {
   const [user] = useAuthState(auth);
@@ -117,16 +114,18 @@ const page = () => {
     }
   };
 
-  const retrieveFlashcards = async () => {
-    const docRef = doc(db, user.uid, "flashcards");
+  useEffect(() => { 
+    retrieveFlashcards();
+  }, []);
 
+  const retrieveFlashcards = async () => {
     try {
-      let subcollections = await listCollections(docRef);
+      let innerCollections = await subcollections(docRef);
   
       let allFlashCards = [];
     
-      for (let subcollection of subcollections) {
-        const subCollectionRef = collection(docRef, subcollection.id);
+      for (let innerCollection of innerCollections) {
+        const subCollectionRef = collection(docRef, innerCollection.id);
         const querySnapshot = await getDocs(subCollectionRef);
     
         let flashCardsData = [];
@@ -140,7 +139,7 @@ const page = () => {
           flashCardsData.push(documentData);
         });
     
-        allFlashCards.push({ subcollectionId: subcollection.id, cards: flashCardsData });
+        allFlashCards.push({ subcollectionId: innerCollection.id, cards: flashCardsData });
       }
     
       setStorageFlashcards(allFlashCards);
@@ -293,11 +292,11 @@ const page = () => {
                   <Card>
                     <CardContent>
                       <Typography variant="h6">Front:</Typography>
-                      <Typography>{storageFlashcard["front"]}</Typography>
+                      <Typography>{storageFlashcard.cards["front"]}</Typography>
                       <Typography variant="h6" sx={{ mt: 2 }}>
                         Back:
                       </Typography>
-                      <Typography>{storageFlashcard["back"]}</Typography>
+                      <Typography>{storageFlashcard.cards["back"]}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
