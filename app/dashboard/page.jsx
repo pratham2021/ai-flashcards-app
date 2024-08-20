@@ -42,7 +42,7 @@ const page = () => {
       const data = await response.json();
       setFlashcards(data.flashCards);
       alert("Flashcards generated");
-      // storeFlashcards(flashcards);
+      storeFlashcards(flashcards);
       setText("");
     } catch (error) {
       console.error("Error generating flashcards:", error);
