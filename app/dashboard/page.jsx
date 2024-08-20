@@ -113,7 +113,7 @@ const page = () => {
         });
 
         allFlashCards.push(flashCardsData);
-        flashCardsData = [];
+        flashCardsData.splice(0, flashCardsData.length);
       }
 
       setStorageFlashcards(allFlashCards);
