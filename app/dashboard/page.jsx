@@ -1,10 +1,27 @@
 "use client";
 import React, { Fragment, useEffect, useState } from "react";
-import { AppBar, Button, Paper, TextField, Box, Grid, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Button,
+  Paper,
+  TextField,
+  Box,
+  Grid,
+  Toolbar,
+  Typography,
+  Card,
+  CardContent,
+  
+} from "@mui/material";
 import { app, auth, db } from "../../firebase";
 import { useRouter } from "next/navigation";
 import { signOut, deleteUser } from "firebase/auth";
-import { deleteDoc, doc, listCollections, collection } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  listCollections,
+  collection,
+} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -40,8 +57,9 @@ const page = () => {
       }
 
       const data = await response.json();
-      setFlashcards(data.flashCards);
+      setFlashcards(data);
       alert("Flashcards generated");
+      console.log(data);
       // storeFlashcards(flashcards);
       setText("");
     } catch (error) {
@@ -65,9 +83,9 @@ const page = () => {
   //   const uniqueIdentification = crypto.randomUUID();
 
   //   const docRef = doc(db, user.uid, "flashcards");
-    
+
   //   const subCollectionRef = collection(docRef, uniqueIdentification);
-    
+
   //   cardsToStore.forEach(async (card, index) => {
   //     const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
 
@@ -96,8 +114,8 @@ const page = () => {
   //     const subcollections = await listCollections(docRef);
 
   //     const allFlashCards = [];
-  //     const flashCardsData = []; 
-      
+  //     const flashCardsData = [];
+
   //     for (const subcollection of subcollections) {
   //       const subCollectionRef = collection(docRef, subcollection.id);
 
@@ -105,7 +123,7 @@ const page = () => {
 
   //       querySnapshot.forEach(doc => {
   //         const documentData = {
-  //           id: doc.id, 
+  //           id: doc.id,
   //           ...doc.data()
   //         };
 
@@ -256,12 +274,29 @@ const page = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={5} style={{ padding: 30 }}>
-            {storageFlashcards.map((storageFlashcard, index) => (
-              <Flashcard key={index} question={storageFlashcard["question"]} answer={storageFlashcard["answer"]}/>
-            ))}
-        </Grid>
-
+        {flashcards.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Generated Flashcards
+            </Typography>
+            <Grid container spacing={2}>
+              {flashcards.map((flashcard, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6">Front:</Typography>
+                      <Typography>{flashcard.front}</Typography>
+                      <Typography variant="h6" sx={{ mt: 2 }}>
+                        Back:
+                      </Typography>
+                      <Typography>{flashcard.back}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
       </motion.div>
     </Fragment>
   );
