@@ -58,8 +58,10 @@ export default function Flashcards() {
   }, []);
 
   const getFlashcards = async (uuid) => {
-    const docRef = db.collection("users").doc(uuid);
-    const subcollectionRef = docRef.collection('flashcardSets');
+    doc
+    const docRef = doc(collection(db, "users"), uuid);
+
+    const subcollectionRef = collection(docRef, 'flashcardSets');
 
     let newDocData = [];
     let allData = [];
