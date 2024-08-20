@@ -77,7 +77,6 @@ const page = () => {
       const subDocRef = doc(subCollectionRef, `Flashcard ${index + 1}`);
 
       await setDoc(subDocRef, {
-        // Insert key value pairs
         topic: "",
         question: "",
         answer: ""
