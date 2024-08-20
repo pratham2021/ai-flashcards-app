@@ -54,12 +54,7 @@ const page = () => {
     if (!auth.currentUser || !user) {
       router.push("/");
     }
-
-    // Retrieve flashcards from Firebase
-    
-
-
-  }, [user, flashcards, storageFlashcards]);
+  }, [user]);
 
   const logTheUserOut = () => {
     signOut(auth);
@@ -100,11 +95,10 @@ const page = () => {
     try {
       const subcollections = await listCollections(docRef);
 
-      const allDocumentsData = [];
+      const allFlashCards = [];
+      const flashCardsData = []; 
       
       for (const subcollection of subcollections) {
-        console.log(`Fetching documents from subcollection: ${subcollection.id}`);
-
         const subCollectionRef = collection(docRef, subcollection.id);
 
         const querySnapshot = await getDocs(subCollectionRef);
@@ -115,11 +109,14 @@ const page = () => {
             ...doc.data()
           };
 
-          allDocumentsData.push(documentData);
+          flashCardsData.push(documentData);
         });
+
+        allFlashCards.push(flashCardsData);
+        flashCardsData = [];
       }
 
-      setStorageFlashcards(allDocumentsData);
+      setStorageFlashcards(allFlashCards);
     }
     catch (error) {
       alert("Error retrieving flashcards.")
