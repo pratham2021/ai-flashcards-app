@@ -40,6 +40,7 @@ const page = () => {
 
       const data = await response.json();
       setFlashcards(data.flashCards);
+      alert("Flashcards generated");
     } catch (error) {
       console.error("Error generating flashcards:", error);
       alert("An error occurred while generating flashcards. Please try again.");
